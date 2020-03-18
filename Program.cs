@@ -31,6 +31,11 @@ namespace Module3
             ListeAuteurs.ElementAt(3).addFacture(new Facture(3700, ListeAuteurs.ElementAt(3)));
         }
 
+        private static void displayAuthor(Auteur author, string prefix = "")
+        {
+            Console.WriteLine(prefix + "  " + author.Prenom + " " + author.Nom);
+        }
+
         private static void displayAuthorDict<T>(Dictionary<Auteur, T> dict, string prefix = "")
         {
             foreach (KeyValuePair<Auteur, T> item in dict)
@@ -39,6 +44,15 @@ namespace Module3
                 Console.WriteLine(prefix + "  " + author.Prenom + " " + author.Nom + ": " + item.Value);
             }
         }
+
+        private static void displayIEnumerable(IEnumerable<string> list, string prefix = "")
+        {
+            foreach (string item in list)
+            {
+                Console.WriteLine(prefix + "  " + item);
+            }
+        }
+
 
         static void Main(string[] args)
         {
@@ -49,17 +63,14 @@ namespace Module3
             #region Liste des prénoms des auteurs dont le nom commence par 'G'
             Console.WriteLine("Liste des prénoms des auteurs dont le nom commence par 'G':");
             IEnumerable<string> gLastNameAuthorsFirstName = ListeAuteurs.Where(a => a.Nom.StartsWith("G")).Select(a => a.Prenom);
-            foreach (string prenom in gLastNameAuthorsFirstName)
-            {
-                Console.WriteLine("  " + prenom);
-            }
+            displayIEnumerable(gLastNameAuthorsFirstName);
             Console.WriteLine();
             #endregion
 
             #region Auteur ayant écrit le plus de livres
             Console.WriteLine("Auteur ayant écrit le plus de livres:");
             Auteur mostWrittenBooksAuthor = ListeLivres.GroupBy(l => l.Auteur).OrderByDescending(a => a.Count()).FirstOrDefault().Key;
-            Console.WriteLine("  " + mostWrittenBooksAuthor.Prenom + " " + mostWrittenBooksAuthor.Nom);
+            displayAuthor(mostWrittenBooksAuthor);
             Console.WriteLine();
             #endregion
 
@@ -110,21 +121,21 @@ namespace Module3
             #region Titres de tous les livres triés par ordre alphabétique
             Console.WriteLine("Titres de tous les livres triés par ordre alphabétique:");
             IEnumerable<string> sortedBooksTitles = ListeLivres.OrderByDescending(l => l.Titre).Select(l => l.Titre).Distinct();
-            foreach (string title in sortedBooksTitles)
-            {
-                Console.WriteLine("  " + title);
-            }
-            Console.WriteLine();
+            displayIEnumerable(sortedBooksTitles);
             #endregion
 
             #region Liste des livres dont le nombre de pages est supérieur à la moyenne
             Console.WriteLine("Liste des livres dont le nombre de pages est supérieur à la moyenne:");
+            double pagesAvg = ListeLivres.Average(l => l.NbPages);
+            IEnumerable<Livre> booksBiggerThanAvg = ListeLivres.Where(l => l.NbPages > pagesAvg);
+            displayIEnumerable(booksBiggerThanAvg.Select(l => l.Titre));
             Console.WriteLine();
             #endregion
 
             #region Auteur ayant écrit le moins de livres
             Console.WriteLine("Auteur ayant écrit le moins de livres:");
-            Console.WriteLine();
+            Auteur lestWrittenBooksAuthor = ListeAuteurs.OrderBy(a => ListeLivres.Count(l => l.Auteur == a)).FirstOrDefault();
+            displayAuthor(lestWrittenBooksAuthor);
             #endregion
 
             Console.ReadKey();
