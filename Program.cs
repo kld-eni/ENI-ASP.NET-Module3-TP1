@@ -76,11 +76,11 @@ namespace Module3
 
             #region Nombre moyen de pages par livre par auteur
             Console.WriteLine("Nombre moyen de pages par livre par auteur:");
-            Dictionary<Auteur, double> booksPageCountAvgByAuthor = new Dictionary<Auteur, double>();
-            foreach (IGrouping<Auteur, Livre> booksForAuthor in booksByAuthor)
+            Dictionary<Auteur, double> booksPageCountAvgByAuthor = ListeAuteurs.ToDictionary(a => a, a =>
             {
-                booksPageCountAvgByAuthor.Add(booksForAuthor.Key, booksForAuthor.Average(l => l.NbPages));
-            }
+                IEnumerable<Livre> booksForAuthor = ListeLivres.Where(l => l.Auteur == a);
+                return booksForAuthor.Count() != 0 ? booksForAuthor.Average(l => l.NbPages): 0;
+            });
             displayAuthorDict<double>(booksPageCountAvgByAuthor);
             Console.WriteLine();
             #endregion
@@ -107,13 +107,11 @@ namespace Module3
 
             #region Auteurs et liste de leurs livres
             Console.WriteLine("Auteurs et liste de leurs livres:");
-            Dictionary<Auteur, string> booksStringByAuthor = new Dictionary<Auteur, string>();
-            foreach (IGrouping<Auteur, Livre> booksForAuthor in booksByAuthor)
+            Dictionary<Auteur, string> booksStringByAuthor = ListeAuteurs.ToDictionary(a => a, a =>
             {
-                Auteur author = booksForAuthor.Key;
-                string booksListString = string.Join(", ", booksForAuthor.Select(l => l.Titre).ToArray());
-                booksStringByAuthor.Add(author, booksListString);
-            }
+                IEnumerable<Livre> booksForAuthor = ListeLivres.Where(l => l.Auteur == a);
+                return booksForAuthor.Count() != 0 ? string.Join(", ", booksForAuthor.Select(l => l.Titre).ToArray()) : "-";
+            });
             displayAuthorDict<string>(booksStringByAuthor);
             Console.WriteLine();
             #endregion
@@ -122,6 +120,7 @@ namespace Module3
             Console.WriteLine("Titres de tous les livres triés par ordre alphabétique:");
             IEnumerable<string> sortedBooksTitles = ListeLivres.OrderByDescending(l => l.Titre).Select(l => l.Titre).Distinct();
             displayIEnumerable(sortedBooksTitles);
+            Console.WriteLine();
             #endregion
 
             #region Liste des livres dont le nombre de pages est supérieur à la moyenne
